@@ -13,6 +13,9 @@ const dateMinutes = document.querySelector("[data-minutes]");
 const dateSeconds = document.querySelector("[data-seconds]");
 
 buttonStart.disabled = true;
+let time = null;
+let intervalId = null;
+let userDate = null;
 
 const options = {
   enableTime: true,
@@ -21,8 +24,12 @@ const options = {
   minuteIncrement: 1,
   onClose(selectedDates) {
       if (selectedDates[0].getTime() < Date.now()) {
-          iziToast.warning({ message: 'Please choose a date in the future'});
-    }
+          iziToast.warning({ message: 'Please choose a date in the future' });
+      } else { 
+        userDate = selectedDates[0].getTime();
+          buttonStart.disabled = false;
+          inputDate.disabled = true;
+      }
   },
 };
 // formula done seconds, minutes, hours
@@ -41,32 +48,26 @@ const formatTime = milliseconds => {
 }
 
 const fp = flatpickr(inputDate, options);
-let time = null;
-let intervalId = null;
 
-
-inputDate.addEventListener("input", () => { 
-
-    let dateNow = new Date(inputDate.value);
-    if (Date.now() < dateNow) {
-        buttonStart.disabled = false;
-        buttonStart.addEventListener("click", () => { 
-        intervalId = setInterval(() => {
-            const currentDate = Date.now();
-            
-            const dateTimer = dateNow - currentDate; 
-            time = formatTime(dateTimer);
-            dateDay.textContent = time[0];
-            dateHour.textContent = time[1];
-            dateMinutes.textContent = time[2];
-            dateSeconds.textContent = time[3];
-                if (dateTimer < 1000) {
-                    clearInterval(intervalId);
-                    buttonStart.disabled = true;
-                }
-            }, 1000);
-        });
-    } 
+buttonStart.addEventListener("click", () => {
+    buttonStart.disabled = true;
+intervalId = setInterval(() => {
+    const currentDate = Date.now();
+    const dateTimer = userDate - currentDate; 
+    time = formatTime(dateTimer);
+    dateDay.textContent = time[0];
+    dateHour.textContent = time[1];
+    dateMinutes.textContent = time[2];
+    dateSeconds.textContent = time[3];
+        if (dateTimer < 1000) {
+            clearInterval(intervalId);
+            buttonStart.disabled = true;
+            return;
+        }
+    }, 1000);
 });
+
+
+
 
 
