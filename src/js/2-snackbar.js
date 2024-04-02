@@ -3,16 +3,25 @@ import iziToast from "izitoast";
 import "izitoast/dist/css/iziToast.min.css";
 
 const form = document.querySelector(".form");
-let inputRadioValue = null;
-let delay = null;
+
 
 
 form.addEventListener("submit", (event) => {
     event.preventDefault();
-    inputRadioValue = event.target.elements.state.value;
-    delay = event.target.elements.delay.value;
-     const promise = createPromise(inputRadioValue ,delay);
-    promise.then().catch();
+    const inputRadioValue = event.target.elements.state.value;
+    const delay = event.target.elements.delay.value;
+    const promise = createPromise(inputRadioValue, delay);
+    promise.then(() => {
+        iziToast.success({
+            position: "topRight",
+            message: `✅ Fulfilled promise in ${delay}ms`
+        });
+    }).catch(() => {
+        iziToast.error({
+            position: "topRight",
+            message: `❌ Rejected promise in ${delay}ms`,
+        });
+    });
 });
 
 
@@ -21,13 +30,9 @@ function createPromise(inputRadioValue, delay) {
 
         setTimeout(() => {
             if (inputRadioValue === "fulfilled") {
-                resolve(iziToast.success({
-            message: `✅ Fulfilled promise in ${delay}ms`
-        }));
+                resolve(delay);
             } else if (inputRadioValue === "rejected") {
-                reject( iziToast.error({
-            message: `❌ Rejected promise in ${delay}ms`
-        }));
+                reject(delay);
             }
         }, delay);
     });
